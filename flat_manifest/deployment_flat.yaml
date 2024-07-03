@@ -222,10 +222,10 @@ spec:
             periodSeconds: 5
           resources:
             limits:
-              memory: 2040Mi
+              memory: 5Gi
             requests:
-              cpu: 4800m
-              memory: 2040Mi
+              cpu: 5000m
+              memory: 5Gi
           startupProbe:
             failureThreshold: 12
             httpGet:
