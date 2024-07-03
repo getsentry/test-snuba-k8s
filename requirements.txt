@@ -1,0 +1,1 @@
+sentry-k8s-libsonnet==0.0.2
