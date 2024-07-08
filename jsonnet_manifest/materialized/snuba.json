@@ -1,5 +1,5 @@
-{
-   "snuba-admin": {
+[
+   {
       "apiVersion": "apps/v1",
       "kind": "Deployment",
       "metadata": {
@@ -15,7 +15,7 @@
          "namespace": "default"
       },
       "spec": {
-         "minReadySeconds": 60,
+         "minReadySeconds": 5,
          "replicas": 1,
          "selector": {
             "matchLabels": {
@@ -154,15 +154,82 @@
                         },
                         "initialDelaySeconds": 10,
                         "periodSeconds": 10
-                     }
+                     },
+                     "volumeMounts": [
+                        {
+                           "mountPath": "/dev/shm",
+                           "name": "dhsn"
+                        },
+                        {
+                           "mountPath": "/etc/snuba.conf.py",
+                           "name": "snuba-config",
+                           "readOnly": true,
+                           "subPath": "snuba.conf.py"
+                        }
+                     ]
                   }
                ],
-               "serviceAccountName": "snuba-admin"
+               "serviceAccountName": "snuba-admin",
+               "terminationGracePeriodSeconds": 40,
+               "volumes": [
+                  {
+                     "configMap": {
+                        "items": [
+                           {
+                              "key": "snuba.conf.py",
+                              "path": "snuba.conf.py"
+                           }
+                        ],
+                        "name": "snuba"
+                     },
+                     "name": "snuba-config"
+                  },
+                  {
+                     "emptyDir": {
+                        "medium": "Memory"
+                     },
+                     "name": "dshm"
+                  },
+                  {
+                     "emptyDir": { },
+                     "name": "envoy-bootstrap-data"
+                  }
+               ]
             }
          }
       }
    },
-   "snuba-api": {
+   {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+         "labels": {
+            "service": "snuba-admin"
+         },
+         "name": "snuba-admin",
+         "namespace": "snuba-jsonnet"
+      },
+      "spec": {
+         "ports": [
+            {
+               "port": 8000,
+               "targetPort": 8000
+            }
+         ],
+         "selector": {
+            "service": "snuba-admin"
+         }
+      }
+   },
+   {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+         "name": "snuba-admin",
+         "namespace": "snuba-jsonnet"
+      }
+   },
+   {
       "apiVersion": "apps/v1",
       "kind": "Deployment",
       "metadata": {
@@ -178,7 +245,7 @@
          "namespace": "default"
       },
       "spec": {
-         "minReadySeconds": 60,
+         "minReadySeconds": 5,
          "replicas": 1,
          "selector": {
             "matchLabels": {
@@ -317,12 +384,268 @@
                         },
                         "initialDelaySeconds": 10,
                         "periodSeconds": 10
-                     }
+                     },
+                     "volumeMounts": [
+                        {
+                           "mountPath": "/dev/shm",
+                           "name": "dhsn"
+                        },
+                        {
+                           "mountPath": "/etc/snuba.conf.py",
+                           "name": "snuba-config",
+                           "readOnly": true,
+                           "subPath": "snuba.conf.py"
+                        }
+                     ]
                   }
                ],
-               "serviceAccountName": "snuba-api"
+               "serviceAccountName": "snuba-api",
+               "terminationGracePeriodSeconds": 40,
+               "volumes": [
+                  {
+                     "configMap": {
+                        "items": [
+                           {
+                              "key": "snuba.conf.py",
+                              "path": "snuba.conf.py"
+                           }
+                        ],
+                        "name": "snuba"
+                     },
+                     "name": "snuba-config"
+                  },
+                  {
+                     "emptyDir": {
+                        "medium": "Memory"
+                     },
+                     "name": "dshm"
+                  },
+                  {
+                     "emptyDir": { },
+                     "name": "envoy-bootstrap-data"
+                  }
+               ]
             }
          }
       }
+   },
+   {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+         "labels": {
+            "service": "snuba-api"
+         },
+         "name": "snuba-api",
+         "namespace": "snuba-jsonnet"
+      },
+      "spec": {
+         "ports": [
+            {
+               "port": 1218,
+               "targetPort": 1218
+            }
+         ],
+         "selector": {
+            "service": "snuba-api"
+         }
+      }
+   },
+   {
+      "apiVersion": "v1",
+      "kind": "ServiceAccount",
+      "metadata": {
+         "name": "snuba-api",
+         "namespace": "snuba-jsonnet"
+      }
+   },
+   {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+         "labels": {
+            "app_feature": "something",
+            "app_function": "storage",
+            "component": "errors",
+            "service": "snuba",
+            "subsystem": null,
+            "system": "kafka_consumer"
+         },
+         "name": "snuba-errors",
+         "namespace": "default"
+      },
+      "spec": {
+         "minReadySeconds": 5,
+         "replicas": 1,
+         "selector": {
+            "matchLabels": {
+               "component": "errors",
+               "service": "snuba"
+            }
+         },
+         "strategy": {
+            "rollingUpdate": {
+               "maxSurge": 100,
+               "maxUnavailable": 0
+            }
+         },
+         "template": {
+            "metadata": {
+               "annotations": {
+                  "configVersion": "1b6513a9eaebcd3a0cd7523829ea7cdb"
+               },
+               "labels": {
+                  "app_feature": "something",
+                  "app_function": "storage",
+                  "component": "errors",
+                  "service": "snuba",
+                  "subsystem": null,
+                  "system": "kafka_consumer"
+               }
+            },
+            "spec": {
+               "containers": [
+                  {
+                     "args": [
+                        "rust-consumer",
+                        "--storage",
+                        "errors",
+                        "--consumer-group",
+                        "snuba-consumers",
+                        "--max-batch-time-ms",
+                        "1100",
+                        "--concurrency",
+                        "4",
+                        "--auto-offset-reset",
+                        "earliest",
+                        "--no-strict-offset-reset"
+                     ],
+                     "env": [
+                        {
+                           "name": "CLICKHOUSE_MIGRATIONS_USER",
+                           "value": "snuba"
+                        },
+                        {
+                           "name": "ENVOY_ADMIN_PORT",
+                           "value": "15000"
+                        },
+                        {
+                           "name": "SENTRY_ENVIRONMENT",
+                           "value": "st-mystuff"
+                        },
+                        {
+                           "name": "SNUBA_PROFILES_SAMPLE_RATE",
+                           "value": "1.0"
+                        },
+                        {
+                           "name": "SNUBA_SETTINGS",
+                           "value": "/etc/snuba.conf.py"
+                        },
+                        {
+                           "name": "UWSGI_DIE_ON_TERM",
+                           "value": "true"
+                        },
+                        {
+                           "name": "UWSGI_DISABLE_LOGGING",
+                           "value": "true"
+                        },
+                        {
+                           "name": "UWSGI_DISABLE_WRITE_EXCEPTION",
+                           "value": "true"
+                        },
+                        {
+                           "name": "UWSGI_ENABLE_THREADS",
+                           "value": "true"
+                        },
+                        {
+                           "name": "UWSGI_HTTP_SOCKET",
+                           "value": "0.0.0.0:0"
+                        },
+                        {
+                           "name": "UWSGI_IGNORE_SIGPIPE",
+                           "value": "true"
+                        },
+                        {
+                           "name": "UWSGI_IGNORE_WRITE_ERRORS",
+                           "value": "true"
+                        },
+                        {
+                           "name": "UWSGI_MAX_REQUESTS",
+                           "value": "10000"
+                        },
+                        {
+                           "name": "UWSGI_NEED_APP",
+                           "value": "true"
+                        }
+                     ],
+                     "image": "us.gcr.io/sentryio/snuba:92816dfc25a17de2dccd3df68a86d8de2871bfc8",
+                     "name": "snuba-errors",
+                     "ports": [
+                        0
+                     ],
+                     "resources": {
+                        "requests": {
+                           "cpu": "4000m",
+                           "memory": "4Gi"
+                        }
+                     },
+                     "volumeMounts": [
+                        {
+                           "mountPath": "/dev/shm",
+                           "name": "dhsn"
+                        },
+                        {
+                           "mountPath": "/etc/snuba.conf.py",
+                           "name": "snuba-config",
+                           "readOnly": true,
+                           "subPath": "snuba.conf.py"
+                        }
+                     ]
+                  }
+               ],
+               "serviceAccountName": "snuba-errors",
+               "terminationGracePeriodSeconds": 40,
+               "volumes": [
+                  {
+                     "configMap": {
+                        "items": [
+                           {
+                              "key": "snuba.conf.py",
+                              "path": "snuba.conf.py"
+                           }
+                        ],
+                        "name": "snuba"
+                     },
+                     "name": "snuba-config"
+                  },
+                  {
+                     "emptyDir": {
+                        "medium": "Memory"
+                     },
+                     "name": "dshm"
+                  },
+                  {
+                     "emptyDir": { },
+                     "name": "envoy-bootstrap-data"
+                  }
+               ]
+            }
+         }
+      }
+   },
+   {
+      "apiVersion": "v1",
+      "data": {
+         "snuba.conf.py": "import os\n\nDEBUG = False\nSENTRY_DSN = None\n\n# Query Specifics\nCLUSTERS = [\n    {\n    'host': 'clickhouse-001',\n    'port': 9000,\n    'http_port': 8123,\n    'storage_sets': {\n        \"cdc\",\n        \"discover\",\n        \"events\",\n        \"events_ro\",\n        \"metrics\",\n        \"migrations\",\n        \"outcomes\",\n        \"querylog\",\n        \"sessions\",\n        \"transactions\",\n        \"profiles\",\n        \"functions\",\n        \"replays\",\n        \"generic_metrics_sets\",\n        \"generic_metrics_distributions\",\n        \"search_issues\",\n        \"generic_metrics_counters\",\n        \"spans\",\n        \"group_attributes\",\n        \"generic_metrics_gauges\",\n        \"metrics_summaries\",\n        \"profile_chunks\",\n    },\n    'single_node': True,\n    },\n]\n\n# Clickhouse migrations to be skipped.\nSKIPPED_MIGRATION_GROUPS = {\n    'querylog',\n    'test_migration',\n}\n\n# Capacity Management\nENFORCE_BYTES_SCANNED_WINDOW_POLICY = False\n\nCLICKHOUSE_READONLY_USER = os.environ.get('CLICKHOUSE_READONLY_USER', 'default')\nCLICKHOUSE_READONLY_PASSWORD = os.environ.get('CLICKHOUSE_READONLY_PASSWORD', '')\n\nCLICKHOUSE_TRACE_USER = os.environ.get('CLICKHOUSE_TRACE_USER', 'default')\nCLICKHOUSE_TRACE_PASSWORD = os.environ.get('CLICKHOUSE_TRACE_PASSWORD', '')\n\n\nDEFAULT_MAX_BATCH_SIZE = 50000\nDEFAULT_MAX_BATCH_TIME_MS = 1000\nDEFAULT_QUEUED_MAX_MESSAGE_KBYTES = 50000\nDEFAULT_QUEUED_MIN_MESSAGES = 20000\n\n# Put query stats back into Clickhouse.\nRECORD_QUERIES = True\n\n# Record COGS in generic metrics consumer.\nRECORD_COGS = False\n\n# Always add these keys to PREWHERE filters to stop reading extra data.\nPREWHERE_KEYS = ['event_id', 'issue', 'tags[sentry:release]', 'message', 'environment', 'project_id']\n\nBROKER_CONFIG = {\n    'bootstrap.servers': 'kafka-001:9092'\n}\n\nREDIS_HOST = '10.225.239.107'\nREDIS_PORT = 6379\nUSE_REDIS_CLUSTER = False\n\nRATE_LIMIT_CLUSTER = None\n\nREDIS_CLUSTERS = {\n    \"cache\": None,\n    \"rate_limiter\": RATE_LIMIT_CLUSTER,\n    \"subscription_store\": None,\n    \"replacements_store\": None,\n    \"config\": None,\n    \"dlq\": None,\n    \"optimize\": None,\n    \"admin_auth\": None,\n}\n\n# replacer settings\nREPLACER_MAX_MEMORY_USAGE = 50 * (1024**3) # 50GB\nREPLACER_KEY_TTL = 1\nREPLACER_IMMEDIATE_OPTIMIZE = True\n\nCONFIG_STATE = {'use_readthrough_query_cache': 1, 'cache_expiry_sec': 500, 'query_settings/max_threads': 12, 'query_settings/max_memory_usage': 20000000000, 'query_settings/prefer_localhost_replica': 0}\n\nTOPIC_PARTITION_COUNTS = {\n    'events': 1,\n    'transactions': 1,\n    'ingest-metrics': 1,\n    'ingest-performance-metrics': 1,\n}\n\nADMIN_REGIONS = [\"s4s\", \"de\", \"disney\", \"geico\", \"goldmansachs\", \"ly\", \"zendesk-eu\"]\n"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+         "labels": {
+            "component": "configmap",
+            "service": "snuba"
+         },
+         "name": "snuba",
+         "namespace": "snuba-jsonnet"
+      }
    }
-}
+]

@@ -11,6 +11,4 @@ render:
 
 .PHONY: materialize
 materialize:
-	jsonnet -J .venv/lib/python3.11/site-packages/static/vendor/ \
-	./jsonnet_manifest/snuba.jsonnet \
-	> jsonnet_manifest/materialized/snuba.json
+	./render.sh

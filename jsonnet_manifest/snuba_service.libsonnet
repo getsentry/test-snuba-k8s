@@ -34,6 +34,7 @@ local make_name(name) = 'snuba-' + name;
        app_function: app_functions.STORAGE,
        system: systems.KAFKA_CONSUMER,
        service_account_name: make_name(name),
+       namespace: namespace,
      })
      + deployment.spec.withReplicas(replicas)
      + deployment.spec.template.metadata.withAnnotations({
@@ -44,7 +45,6 @@ local make_name(name) = 'snuba-' + name;
          name='snuba-' + name,
          image='us.gcr.io/sentryio/snuba:92816dfc25a17de2dccd3df68a86d8de2871bfc8'
        )
-       + container.withPorts(port)
        + container.withEnvMap({
          SNUBA_SETTINGS: '/etc/snuba.conf.py',
          SENTRY_ENVIRONMENT: 'st-mystuff',
@@ -65,11 +65,14 @@ local make_name(name) = 'snuba-' + name;
        + container.withResourcesRequests(cpu, memory)
        + container.withVolumeMounts(
          [
-           volmount.new('dhsn', '/dev/shm'),
+           volmount.new('dshm', '/dev/shm'),
            volmount.new('snuba-config', '/etc/snuba.conf.py', readOnly=true)
            + volmount.withSubPath('snuba.conf.py'),
          ]
-       ),
+       )
+       + if port != null then container.withPorts({
+         containerPort: port,
+       }) else {},
      ])
      + deployment.spec.template.spec.withTerminationGracePeriodSeconds(40)
      + deployment.spec.template.spec.withVolumes([
@@ -155,11 +158,13 @@ local make_name(name) = 'snuba-' + name;
     [name + '-deployment']: mod.build_deployment(
       name,
       namespace,
-      0,  // TODO: Remove this, it does nothing here
+      null,  // TODO: Remove this, it does nothing here
       command,
       replicas,
       cpu,
       memory
     ),
+    [name + '-serviceAccount']: sa.new(make_name(name))
+                                + sa.metadata.withNamespace(namespace),
   },
 }

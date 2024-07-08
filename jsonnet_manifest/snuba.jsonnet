@@ -1,6 +1,11 @@
+local k8s = import 'github.com/jsonnet-libs/k8s-libsonnet/1.29/main.libsonnet';
 local service = import 'snuba_service.libsonnet';
 
 // This is the whole reduced Snuba (admin, api, configmap and consumer)
+
+local configmap = k8s.core.v1.configMap;
+local autoscaler = k8s.autoscaling.v1.horizontalPodAutoscaler;
+local aspec = autoscaler.spec;
 
 std.objectValues(service.build_api_service(
   name='admin',
@@ -49,3 +54,37 @@ std.objectValues(service.build_api_service(
   cpu='4000m',
   memory='4Gi'
 ))
++ [
+  configmap.new(
+    name='snuba',
+    data={
+      'snuba.conf.py': importstr 'config.py',
+    }
+  )
+  + configmap.metadata.withNamespace('snuba-jsonnet')
+  + configmap.metadata.withLabels({
+    component: 'configmap',
+    service: 'snuba',
+  }),
+  //autoscaler.new('snuba-api-production')
+  //+ autoscaler.metadata.withLabels({
+  //  app_feature: 'shared',
+  //  app_function: 'storage',
+  //  cogs_category: 'shared',
+  //  component: 'api',
+  //  environment: 'production',
+  //  is_canary: 'false',
+  //  service: 'snuba',
+  //  shared_resource_id: 'snuba_api',
+  //  system: 'snuba_api',
+  //})
+  //+ autoscaler.metadata.withNamespace('snuba-jsonnet')
+  //+ aspec.withMaxReplicas(2)
+  //+ aspec.withMinReplicas(1)
+  //+ aspec.withTargetCPUUtilizationPercentage(40)
+  //+ aspec.withScaleTargetRef({
+  //  apiVersion: 'apps/v1',
+  //  kind: 'Deployment',
+  //  name: 'snuba-api-production',
+  //}),
+]
