@@ -8,8 +8,16 @@ local sentry_builder = import 'sentry_deployment_builder.libsonnet';
 local deployment = k8s.apps.v1.deployment;
 local container = k8s.core.v1.container;
 local volmount = k8s.core.v1.volumeMount;
+local volume = k8s.core.v1.volume;
+local service = k8s.core.v1.service;
+local sa = k8s.core.v1.serviceAccount;
+
+local make_name(name) = 'snuba-' + name;
 
 {
+  local mod = self,
+
+
   build_deployment(
     name,
     namespace,
@@ -25,7 +33,7 @@ local volmount = k8s.core.v1.volumeMount;
        app_feature: 'something',
        app_function: app_functions.STORAGE,
        system: systems.KAFKA_CONSUMER,
-       service_account_name: std.join('-', ['snuba', name]),
+       service_account_name: make_name(name),
      })
      + deployment.spec.withReplicas(replicas)
      + deployment.spec.template.metadata.withAnnotations({
@@ -54,7 +62,29 @@ local volmount = k8s.core.v1.volumeMount;
          CLICKHOUSE_MIGRATIONS_USER: 'snuba',
        })
        + container.withArgs(command)
-       + container.withResourcesRequests(cpu, memory),
+       + container.withResourcesRequests(cpu, memory)
+       + container.withVolumeMounts(
+         [
+           volmount.new('dhsn', '/dev/shm'),
+           volmount.new('snuba-config', '/etc/snuba.conf.py', readOnly=true)
+           + volmount.withSubPath('snuba.conf.py'),
+         ]
+       ),
+     ])
+     + deployment.spec.template.spec.withTerminationGracePeriodSeconds(40)
+     + deployment.spec.template.spec.withVolumes([
+       volume.fromConfigMap(
+         name='snuba-config',
+         configMapName='snuba',
+         configMapItems=[
+           {
+             key: 'snuba.conf.py',
+             path: 'snuba.conf.py',
+           },
+         ],
+       ),
+       volume.fromEmptyDir('dshm', emptyDir={ medium: 'Memory' }),
+       volume.fromEmptyDir('envoy-bootstrap-data'),
      ]),
 
   build_api_service(
@@ -65,32 +95,71 @@ local volmount = k8s.core.v1.volumeMount;
     replicas,
     cpu,
     memory
-  ): self.build_deployment(
+  ):
+    {
+      [name + '-deployment']: mod.build_deployment(
+        name,
+        namespace,
+        port,
+        command,
+        replicas,
+        cpu,
+        memory
+      ) + editor.patch_container(
+        [make_name(name)],
+        container.lifecycle.preStop.exec.withCommand([
+          '/bin/sh',
+          '-ec',
+          'touch /tmp/snuba.down && sleep 40',
+        ])
+        + container.livenessProbe.httpGet.withPath('/health')
+        + container.livenessProbe.httpGet.withPort(port)
+        + container.livenessProbe.withInitialDelaySeconds(10)
+        + container.livenessProbe.withPeriodSeconds(10)
+        + container.readinessProbe.httpGet.withPath('/health')
+        + container.readinessProbe.httpGet.withPort(port)
+        + container.readinessProbe.withInitialDelaySeconds(10)
+        + container.readinessProbe.withPeriodSeconds(5)
+        + container.startupProbe.httpGet.withPath('/health')
+        + container.startupProbe.httpGet.withPort(port)
+        + container.startupProbe.withInitialDelaySeconds(10)
+        + container.startupProbe.withPeriodSeconds(10)
+      ),
+      [name + '-service']: service.new(
+                             name=make_name(name),
+                             ports=[{
+                               port: port,
+                               targetPort: port,
+                             }],
+                             selector={
+                               service: make_name(name),
+                             }
+                           )
+                           + service.metadata.withName(make_name(name))
+                           + service.metadata.withNamespace(namespace)
+                           + service.metadata.withLabels({
+                             service: make_name(name),
+                           }),
+      [name + '-serviceAccount']: sa.new(make_name(name))
+                                  + sa.metadata.withNamespace(namespace),
+    },
+
+  build_consumer(
     name,
     namespace,
-    port,
     command,
     replicas,
     cpu,
     memory
-  ) + editor.patch_container(
-    ['snuba-' + name],
-    container.lifecycle.preStop.exec.withCommand([
-      '/bin/sh',
-      '-ec',
-      'touch /tmp/snuba.down && sleep 40',
-    ])
-    + container.livenessProbe.httpGet.withPath('/health')
-    + container.livenessProbe.httpGet.withPort(port)
-    + container.livenessProbe.withInitialDelaySeconds(10)
-    + container.livenessProbe.withPeriodSeconds(10)
-    + container.readinessProbe.httpGet.withPath('/health')
-    + container.readinessProbe.httpGet.withPort(port)
-    + container.readinessProbe.withInitialDelaySeconds(10)
-    + container.readinessProbe.withPeriodSeconds(5)
-    + container.startupProbe.httpGet.withPath('/health')
-    + container.startupProbe.httpGet.withPort(port)
-    + container.startupProbe.withInitialDelaySeconds(10)
-    + container.startupProbe.withPeriodSeconds(10)
-  ),
+  ): {
+    [name + '-deployment']: mod.build_deployment(
+      name,
+      namespace,
+      0,  // TODO: Remove this, it does nothing here
+      command,
+      replicas,
+      cpu,
+      memory
+    ),
+  },
 }

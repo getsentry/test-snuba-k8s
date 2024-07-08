@@ -78,7 +78,7 @@ local validate_deployment(sentry_deployment) =
      )
      + deployment.metadata.withLabels(labels(sentry_deployment))
      + deployment.metadata.withNamespace(sentry_deployment.namespace)
-     + deployment.spec.withMinReadySeconds(60)
+     + deployment.spec.withMinReadySeconds(5)
      + deployment.spec.selector.withMatchLabels(
        base_labels(sentry_deployment)
      ) +
