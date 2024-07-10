@@ -337,8 +337,8 @@ spec:
       containers:
         - args:
             - api
-            - --processes=6
-            - --threads=8
+            - --processes=1
+            - --threads=4
           env:
             - name: SNUBA_SETTINGS
               value: /etc/snuba.conf.py
@@ -395,7 +395,7 @@ spec:
             limits:
               memory: 512Mi
             requests:
-              cpu: 256m
+              cpu: 512m
               memory: 512Mi
           startupProbe:
             failureThreshold: 12
