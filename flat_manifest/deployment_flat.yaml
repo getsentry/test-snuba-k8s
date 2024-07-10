@@ -222,10 +222,10 @@ spec:
             periodSeconds: 5
           resources:
             limits:
-              memory: 5Gi
+              memory: 512Mi
             requests:
-              cpu: 5000m
-              memory: 5Gi
+              cpu: 256m
+              memory: 512Mi
           startupProbe:
             failureThreshold: 12
             httpGet:
@@ -393,10 +393,10 @@ spec:
             timeoutSeconds: 2
           resources:
             limits:
-              memory: 5Gi
+              memory: 512Mi
             requests:
-              cpu: 5
-              memory: 5Gi
+              cpu: 256m
+              memory: 512Mi
           startupProbe:
             failureThreshold: 12
             httpGet:
@@ -522,10 +522,10 @@ spec:
           name: snuba
           resources:
             limits:
-              memory: 4Gi
+              memory: 512Mi
             requests:
-              cpu: 4000m
-              memory: 4Gi
+              cpu: 256m
+              memory: 512Mi
           volumeMounts:
             - mountPath: /etc/snuba.conf.py
               name: snuba-config
