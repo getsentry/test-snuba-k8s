@@ -224,7 +224,7 @@ spec:
             limits:
               memory: 512Mi
             requests:
-              cpu: 256m
+              cpu: 500m
               memory: 512Mi
           startupProbe:
             failureThreshold: 12
@@ -524,7 +524,7 @@ spec:
             limits:
               memory: 512Mi
             requests:
-              cpu: 256m
+              cpu: 500m
               memory: 512Mi
           volumeMounts:
             - mountPath: /etc/snuba.conf.py
