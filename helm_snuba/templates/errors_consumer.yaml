@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app_feature: errors
+    app_function: ingest
+    cogs_category: errors
+    component: consumer
+    environment: production
+    service: snuba
+    system: kafka_consumer
+  name: snuba-consumer
+  namespace: {{.Release.Namespace}}
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  selector:
+    matchLabels:
+      component: consumer
+      environment: production
+      service: snuba
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app_feature: errors
+        app_function: ingest
+        cogs_category: errors
+        component: consumer
+        environment: production
+        service: snuba
+        system: kafka_consumer
+    spec:
+      containers:
+        - args:
+            - rust-consumer
+            - --storage
+            - errors
+            - --consumer-group
+            - snuba-consumers
+            - --max-batch-time-ms
+            - "1100"
+            - --concurrency
+            - "4"
+            - --auto-offset-reset
+            - "earliest"
+            - --no-strict-offset-reset
+          env:
+            - name: SENTRY_SINGLE_TENANT
+              value: "1"
+            - name: SNUBA_SETTINGS
+              value: /etc/snuba.conf.py
+            - name: ENVOY_ADMIN_PORT
+              value: "9902"
+            - name: UWSGI_MAX_REQUESTS
+              value: "10000"
+            - name: UWSGI_DISABLE_LOGGING
+              value: "false"
+            - name: UWSGI_ENABLE_THREADS
+              value: "true"
+            - name: UWSGI_DIE_ON_TERM
+              value: "true"
+            - name: UWSGI_NEED_APP
+              value: "true"
+            - name: UWSGI_HTTP_SOCKET
+              value: 0.0.0.0:1218
+            - name: UWSGI_IGNORE_SIGPIPE
+              value: "true"
+            - name: UWSGI_IGNORE_WRITE_ERRORS
+              value: "true"
+            - name: UWSGI_DISABLE_WRITE_EXCEPTION
+              value: "true"
+            - name: UWSGI_THREADS
+              value: "4"
+          image: us.gcr.io/sentryio/snuba:92816dfc25a17de2dccd3df68a86d8de2871bfc8
+          name: snuba
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /etc/snuba.conf.py
+              name: snuba-config
+              readOnly: true
+              subPath: snuba.conf.py
+            - mountPath: /dev/shm
+              name: dshm
+      volumes:
+        - configMap:
+            items:
+              - key: snuba.conf.py
+                path: snuba.conf.py
+            name: snuba
+          name: snuba-config
+        - emptyDir:
+            medium: Memory
+          name: dshm
+        - emptyDir: {}
+          name: envoy-bootstrap-data

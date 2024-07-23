@@ -1,0 +1,169 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app_feature: shared
+    app_function: storage
+    cogs_category: shared
+    component: api
+    environment: production
+    is_canary: "false"
+    service: snuba
+    shared_resource_id: snuba_api
+    system: snuba_api
+  name: snuba-api-production
+  namespace: {{.Release.Namespace}}
+spec:
+  maxReplicas: 2
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: snuba-api-production
+  targetCPUUtilizationPercentage: 40
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: snuba-api
+  namespace: {{.Release.Namespace}}
+spec:
+  clusterIP: None
+  ports:
+    - port: 1218
+      targetPort: 1218
+  selector:
+    component: api
+    environment: production
+    service: snuba
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app_feature: shared
+    app_function: storage
+    cogs_category: shared
+    component: api
+    environment: production
+    is_canary: "false"
+    service: snuba
+    shared_resource_id: snuba_api
+    system: snuba_api
+  name: snuba-api-production
+  namespace: {{.Release.Namespace}}
+spec:
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      component: api
+      environment: production
+      service: snuba
+  strategy:
+    rollingUpdate:
+      maxSurge: 10%
+      maxUnavailable: 10%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app_feature: shared
+        app_function: storage
+        cogs_category: shared
+        component: api
+        environment: production
+        is_canary: "false"
+        service: snuba
+        shared_resource_id: snuba_api
+        system: snuba_api
+    spec:
+      containers:
+        - args:
+            - api
+            - --processes=1
+            - --threads=4
+          env:
+            - name: SNUBA_SETTINGS
+              value: /etc/snuba.conf.py
+            - name: SENTRY_ENVIRONMENT
+              value: st-mystuff
+            - name: UWSGI_MAX_REQUESTS
+              value: "10000"
+            - name: UWSGI_DISABLE_LOGGING
+              value: "true"
+            - name: UWSGI_ENABLE_THREADS
+              value: "true"
+            - name: UWSGI_DIE_ON_TERM
+              value: "true"
+            - name: UWSGI_NEED_APP
+              value: "true"
+            - name: UWSGI_HTTP_SOCKET
+              value: 0.0.0.0:1218
+            - name: UWSGI_IGNORE_SIGPIPE
+              value: "true"
+            - name: UWSGI_IGNORE_WRITE_ERRORS
+              value: "true"
+            - name: UWSGI_DISABLE_WRITE_EXCEPTION
+              value: "true"
+            - name: ENVOY_ADMIN_PORT
+              value: "15000"
+            - name: SNUBA_PROFILES_SAMPLE_RATE
+              value: "1.0"
+            - name: CLICKHOUSE_MIGRATIONS_USER
+              value: snuba
+          image: us.gcr.io/sentryio/snuba:92816dfc25a17de2dccd3df68a86d8de2871bfc8
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -ec
+                  - touch /tmp/snuba.down && sleep 45
+          livenessProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /health
+              port: 1218
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          name: api
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 1218
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 512m
+              memory: 512Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /health
+              port: 1218
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /etc/snuba.conf.py
+              name: snuba-config
+              readOnly: true
+              subPath: snuba.conf.py
+            - mountPath: /dev/shm
+              name: dshm
+      terminationGracePeriodSeconds: 45
+      volumes:
+        - configMap:
+            items:
+              - key: snuba.conf.py
+                path: snuba.conf.py
+            name: snuba
+          name: snuba-config
+        - emptyDir:
+            medium: Memory
+          name: dshm
+        - emptyDir: {}
+          name: envoy-bootstrap-data
