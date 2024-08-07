@@ -137,7 +137,7 @@ metadata:
   namespace: snuba-argo
 spec:
   minReadySeconds: 5
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       service: snuba-admin
