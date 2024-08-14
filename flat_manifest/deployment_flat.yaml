@@ -562,4 +562,4 @@ spec:
         image: busybox
         command: ["sh", "-c", "sleep 300; exit 1"]
       restartPolicy: Never
-  backoffLimit: 4
+  backoffLimit: 1
