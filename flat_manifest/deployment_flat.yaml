@@ -455,7 +455,7 @@ metadata:
   namespace: snuba-argo
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       component: consumer
@@ -560,6 +560,6 @@ spec:
       containers:
       - name: sleep-container
         image: busybox
-        command: ["sh", "-c", "sleep 60; exit 1"]
+        command: ["sh", "-c", "sleep 300; exit 1"]
       restartPolicy: Never
   backoffLimit: 4
