@@ -455,7 +455,7 @@ metadata:
   namespace: snuba-argo
 spec:
   minReadySeconds: 10
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       component: consumer
