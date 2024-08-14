@@ -552,8 +552,9 @@ metadata:
   name: sleep-job
   namespace: snuba-argo
   annotations:
-    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   template:
     spec:
