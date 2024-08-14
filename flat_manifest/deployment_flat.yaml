@@ -560,6 +560,6 @@ spec:
       containers:
       - name: sleep-container
         image: busybox
-        command: ["sh", "-c", "sleep 300; exit 1"]
+        command: ["sh", "-c", "sleep 300"]
       restartPolicy: Never
   backoffLimit: 1
