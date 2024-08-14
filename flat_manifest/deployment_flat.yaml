@@ -545,3 +545,21 @@ spec:
           name: dshm
         - emptyDir: {}
           name: envoy-bootstrap-data
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sleep-job
+  namespace: snuba-argo
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      containers:
+      - name: sleep-container
+        image: busybox
+        command: ["sleep", "300"]
+      restartPolicy: Never
+  backoffLimit: 4
