@@ -10,6 +10,26 @@
       },
       "version": "c5096af9f2bb9f587eb27062fefdfbfa7e0e0842",
       "sum": "4g6NLsf1+cyBtDn+2v43kr7VeDSUz8ewmAawDnuzBBk="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/docsonnet.git",
+          "subdir": "doc-util"
+        }
+      },
+      "version": "6ac6c69685b8c29c54515448eaca583da2d88150",
+      "sum": "BrAL/k23jq+xy9oA7TWIhUx07dsA/QLm3g7ktCwe//U="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
+          "subdir": "1.29"
+        }
+      },
+      "version": "6ecbb7709baf27f44b2e48f3529741ae6754ae6a",
+      "sum": "i2w3hGbgQmaB73t5LJHSioPOVdYv8ZBvivHiDwZJVyI="
     }
   ],
   "legacyImports": false
