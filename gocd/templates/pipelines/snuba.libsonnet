@@ -156,9 +156,9 @@ function(region) {
   lock_behavior: 'unlockWhenFinished',
   materials: {
     snuba_repo: {
-      git: 'git@github.com:getsentry/snuba.git',
+      git: 'git@github.com:getsentry/test-snuba-k8s.git',
       shallow_clone: false,
-      branch: 'master',
+      branch: 'main',
       destination: 'snuba',
     },
   },
