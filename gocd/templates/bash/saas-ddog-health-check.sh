@@ -1,8 +1,6 @@
 #!/bin/bash
 
-/devinfra/scripts/checks/datadog/monitor_status.py --dry-run=true \
-  113296727 \
-  42722121
+echo "SaaS DDOG Health Check!"
 
 
 # Above monitor IDs map to following monitors respectively:

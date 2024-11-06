@@ -4,15 +4,15 @@ local pipedream = import 'github.com/getsentry/gocd-jsonnet/libs/pipedream.libso
 local pipedream_config = {
   name: 'snuba',
   materials: {
-    snuba_repo: {
+    test_snuba_k8s_repo: {
       git: 'git@github.com:getsentry/test-snuba-k8s.git',
       shallow_clone: true,
-      branch: 'master',
+      branch: 'main',
       destination: 'snuba',
     },
   },
   rollback: {
-    material_name: 'snuba_repo',
+    material_name: 'test_snuba_k8s_repo',
     stage: 'deploy-primary',
     elastic_profile_id: 'snuba',
   },
