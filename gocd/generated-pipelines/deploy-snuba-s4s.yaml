@@ -1,0 +1,79 @@
+format_version: 10
+pipelines:
+  deploy-snuba-s4s:
+    display_order: 2
+    environment_variables:
+      GITHUB_TOKEN: '{{SECRET:[devinfra-github][token]}}'
+      GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}'
+      SENTRY_REGION: s4s
+    group: snuba
+    lock_behavior: unlockWhenFinished
+    materials:
+      test_snuba_k8s_repo:
+        branch: main
+        destination: snuba
+        git: git@github.com:getsentry/test-snuba-k8s.git
+        shallow_clone: false
+    stages:
+      - checks:
+          jobs:
+            checks:
+              elastic_profile_id: snuba
+              tasks:
+                - script: |
+                    ##!/bin/bash
+
+                    /devinfra/scripts/checks/githubactions/checkruns.py \
+                      --timeout-mins 60 \
+                      getsentry/snuba \
+                      ${GO_REVISION_SNUBA_REPO} \
+                      "Tests and code coverage (test)"
+      - deploy-primary:
+          fetch_materials: true
+          jobs:
+            deploy-primary:
+              elastic_profile_id: snuba
+              environment_variables:
+                LABEL_SELECTOR: service=snuba
+              tasks:
+                - script: |
+                    ##!/bin/bash
+
+                    eval $(/devinfra/scripts/regions/project_env_vars.py --region="${SENTRY_REGION}")
+
+                    /devinfra/scripts/k8s/k8stunnel
+
+                    /devinfra/scripts/k8s/k8s-deploy.py \
+                      --label-selector="${LABEL_SELECTOR}" \
+                      --image="us-central1-docker.pkg.dev/sentryio/snuba/image:${GO_REVISION_SNUBA_REPO}" \
+                      --container-name="snuba" \
+                      --container-name="snuba-admin"
+
+                    /devinfra/scripts/k8s/k8s-deploy.py \
+                      --label-selector="${LABEL_SELECTOR}" \
+                      --image="us-central1-docker.pkg.dev/sentryio/snuba/image:${GO_REVISION_SNUBA_REPO}" \
+                      --type="cronjob" \
+                      --container-name="cleanup"
+              timeout: 1200
+      - health_check:
+          jobs:
+            health_check:
+              elastic_profile_id: snuba
+              environment_variables:
+                DATADOG_API_KEY: '{{SECRET:[devinfra][st_datadog_api_key]}}'
+                DATADOG_APP_KEY: '{{SECRET:[devinfra][st_datadog_app_key]}}'
+                LABEL_SELECTOR: service=snuba
+                SENTRY_AUTH_TOKEN: '{{SECRET:[devinfra-sentryio][token]}}'
+              tasks:
+                - script: |
+                    ##!/bin/bash
+
+                    echo "S4S Health Check!"
+                - script: |
+                    ##!/bin/bash
+      - pipeline-complete:
+          jobs:
+            pipeline-complete:
+              tasks:
+                - exec:
+                    command: true
