@@ -15,7 +15,7 @@ pipelines:
         display_order: 100 # Ensure it's last pipeline in UI
         lock_behavior: unlockWhenFinished
         materials:
-            snuba_repo:
+            test_snuba_k8s_repo:
                 git: git@github.com:getsentry/snuba.git
                 shallow_clone: true
                 branch: master
