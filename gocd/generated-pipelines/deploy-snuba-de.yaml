@@ -21,7 +21,6 @@ pipelines:
       - checks:
           jobs:
             checks:
-              elastic_profile_id: snuba
               tasks:
                 - script: |
                     ##!/bin/bash
@@ -35,7 +34,6 @@ pipelines:
           fetch_materials: true
           jobs:
             deploy-primary:
-              elastic_profile_id: snuba
               environment_variables:
                 LABEL_SELECTOR: service=snuba
               tasks:
