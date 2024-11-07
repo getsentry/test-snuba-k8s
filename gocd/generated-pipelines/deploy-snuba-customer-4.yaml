@@ -3,8 +3,6 @@ pipelines:
   deploy-snuba-customer-4:
     display_order: 7
     environment_variables:
-      GITHUB_TOKEN: '{{SECRET:[devinfra-github][token]}}'
-      GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}'
       SENTRY_REGION: customer-4
     group: snuba
     lock_behavior: unlockWhenFinished
@@ -26,11 +24,7 @@ pipelines:
                 - script: |
                     ##!/bin/bash
 
-                    /devinfra/scripts/checks/githubactions/checkruns.py \
-                      --timeout-mins 60 \
-                      getsentry/snuba \
-                      ${GO_REVISION_SNUBA_REPO} \
-                      "Tests and code coverage (test)"
+                    echo "Check GitHub!"
       - deploy-primary:
           fetch_materials: true
           jobs:

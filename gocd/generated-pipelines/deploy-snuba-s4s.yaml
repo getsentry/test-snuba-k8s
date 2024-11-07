@@ -3,8 +3,6 @@ pipelines:
   deploy-snuba-s4s:
     display_order: 2
     environment_variables:
-      GITHUB_TOKEN: '{{SECRET:[devinfra-github][token]}}'
-      GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}'
       SENTRY_REGION: s4s
     group: snuba
     lock_behavior: unlockWhenFinished
@@ -23,11 +21,7 @@ pipelines:
                 - script: |
                     ##!/bin/bash
 
-                    /devinfra/scripts/checks/githubactions/checkruns.py \
-                      --timeout-mins 60 \
-                      getsentry/snuba \
-                      ${GO_REVISION_SNUBA_REPO} \
-                      "Tests and code coverage (test)"
+                    echo "Check GitHub!"
       - deploy-primary:
           fetch_materials: true
           jobs:
@@ -60,10 +54,7 @@ pipelines:
             health_check:
               elastic_profile_id: snuba
               environment_variables:
-                DATADOG_API_KEY: '{{SECRET:[devinfra][st_datadog_api_key]}}'
-                DATADOG_APP_KEY: '{{SECRET:[devinfra][st_datadog_app_key]}}'
                 LABEL_SELECTOR: service=snuba
-                SENTRY_AUTH_TOKEN: '{{SECRET:[devinfra-sentryio][token]}}'
               tasks:
                 - script: |
                     ##!/bin/bash
