@@ -15,9 +15,6 @@ local s4s_health_check(region) =
           jobs: {
             health_check: {
               environment_variables: {
-                SENTRY_AUTH_TOKEN: '{{SECRET:[devinfra-sentryio][token]}}',
-                DATADOG_API_KEY: '{{SECRET:[devinfra][st_datadog_api_key]}}',
-                DATADOG_APP_KEY: '{{SECRET:[devinfra][st_datadog_app_key]}}',
                 LABEL_SELECTOR: 'service=snuba',
               },
               elastic_profile_id: 'snuba',
@@ -42,9 +39,6 @@ local saas_health_check(region) =
           jobs: {
             health_check: {
               environment_variables: {
-                SENTRY_AUTH_TOKEN: '{{SECRET:[devinfra-sentryio][token]}}',
-                DATADOG_API_KEY: '{{SECRET:[devinfra][sentry_datadog_api_key]}}',
-                DATADOG_APP_KEY: '{{SECRET:[devinfra][sentry_datadog_app_key]}}',
                 LABEL_SELECTOR: 'service=snuba',
               },
               elastic_profile_id: 'snuba',
@@ -72,9 +66,6 @@ local deploy_canary_stage(region) =
               timeout: 1200,
               elastic_profile_id: 'snuba',
               environment_variables: {
-                SENTRY_AUTH_TOKEN: '{{SECRET:[devinfra-sentryio][token]}}',
-                DATADOG_API_KEY: '{{SECRET:[devinfra][sentry_datadog_api_key]}}',
-                DATADOG_APP_KEY: '{{SECRET:[devinfra][sentry_datadog_app_key]}}',
                 LABEL_SELECTOR: 'service=snuba,is_canary=true',
               },
               tasks: [
@@ -92,9 +83,6 @@ local deploy_canary_stage(region) =
 function(region) {
   environment_variables: {
     SENTRY_REGION: region,
-    // Required for checkruns.
-    GITHUB_TOKEN: '{{SECRET:[devinfra-github][token]}}',
-    GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
   },
   lock_behavior: 'unlockWhenFinished',
   materials: {
