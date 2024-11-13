@@ -1,7 +1,7 @@
 format_version: 10
 pipelines:
   test_pipeline1:
-    group: sample
+    group: test
     label_template: ${COUNT}
     lock_behavior: none
     display_order: -1
