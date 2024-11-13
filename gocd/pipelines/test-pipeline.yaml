@@ -1,0 +1,32 @@
+format_version: 10
+pipelines:
+  test_pipeline1:
+    group: sample
+    label_template: ${COUNT}
+    lock_behavior: none
+    display_order: -1
+    materials:
+      test_snuba:
+        git: https://github.com/getsentry/test-snuba-k8s.git
+        shallow_clone: true
+        auto_update: true
+        branch: master
+    stages:
+    - default_stage:
+        fetch_materials: true
+        keep_artifacts: false
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          default_job:
+            timeout: 0
+            tabs:
+              Sample: my-artifact.html
+            elastic_profile_id: test-pipeline
+            tasks:
+            - script: |
+                echo "A test pipeline"
+            - exec:
+                command: ./scripts/sayhi.sh
