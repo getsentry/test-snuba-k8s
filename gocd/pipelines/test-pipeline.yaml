@@ -31,4 +31,4 @@ pipelines:
             - script: |
                 ls -al
             - exec:
-                command: /scripts/sayhi.sh
+                command: ./scripts/sayhi.sh
