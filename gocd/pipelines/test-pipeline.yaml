@@ -27,7 +27,7 @@ pipelines:
             elastic_profile_id: demo-app
             tasks:
             - script: |
-                echo "A test pipeline"
+                sleep 30
             - script: |
                 ls -al /
             - exec:
