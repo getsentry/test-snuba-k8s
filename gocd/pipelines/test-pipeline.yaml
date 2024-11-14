@@ -7,7 +7,7 @@ pipelines:
     display_order: -1
     materials:
       test_snuba:
-        git: https://github.com/getsentry/test-snuba-k8s.git
+        git: https://github.com/getsentry/test-snuba-k8s
         shallow_clone: true
         auto_update: true
         branch: master
