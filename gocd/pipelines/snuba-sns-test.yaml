@@ -33,7 +33,7 @@ pipelines:
                   jobs:
                       checks-migrations:
                           timeout: 1800
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     deploy_sha=`snuba/scripts/fetch_service_refs.py --pipeline "deploy-snuba-sns-test"` && \
@@ -43,7 +43,7 @@ pipelines:
                   jobs:
                       deploy:
                           timeout: 1200
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     /devinfra/scripts/k8s/k8stunnel \
@@ -103,7 +103,7 @@ pipelines:
                   jobs:
                       migrate:
                           timeout: 1200
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     /devinfra/scripts/k8s/k8stunnel \

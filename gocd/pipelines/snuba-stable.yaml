@@ -28,7 +28,7 @@ pipelines:
                   jobs:
                       checks:
                           timeout: 1800
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     /devinfra/scripts/checks/githubactions/checkruns.py \
@@ -57,7 +57,7 @@ pipelines:
                           environment_variables:
                               SENTRY_AUTH_TOKEN: "{{SECRET:[devinfra-sentryio][token]}}"
                           timeout: 300
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     sentry-cli releases new "${GO_REVISION_SNUBA_REPO}"
@@ -65,7 +65,7 @@ pipelines:
                                     sentry-cli releases deploys "${GO_REVISION_SNUBA_REPO}" new -e canary
                       deploy-canary:
                           timeout: 1200
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     /devinfra/scripts/k8s/k8stunnel \
@@ -114,14 +114,14 @@ pipelines:
                           environment_variables:
                               SENTRY_AUTH_TOKEN: "{{SECRET:[devinfra-sentryio][token]}}"
                           timeout: 300
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     sentry-cli releases deploys "${GO_REVISION_SNUBA_REPO}" new -e production
                                     sentry-cli releases finalize "${GO_REVISION_SNUBA_REPO}"
                       deploy:
                           timeout: 1200
-                          elastic_profile_id: snuba
+                          
                           tasks:
                               - script: |
                                     /devinfra/scripts/k8s/k8stunnel \
