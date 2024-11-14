@@ -24,7 +24,7 @@ pipelines:
             timeout: 0
             tabs:
               Sample: my-artifact.html
-            elastic_profile_id: demo-app
+            elastic_profile_id: snuba
             tasks:
             - script: |
                 sleep 30
