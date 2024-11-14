@@ -29,7 +29,7 @@ pipelines:
             - script: |
                 echo "A test pipeline"
             - script: |
-                ls -al /devinfra/
+                ls -al /
             - exec:
                 command: ./scripts/sayhi.sh
             - exec:
