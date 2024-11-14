@@ -33,7 +33,9 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - exec:
-                command: gcloud container clusters get-credentials gke --region us-west1 --project eng-dev-sbx--nikhar-1
+                command: gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_LOCATION" --project "$GCP_PROJECT"
+            - exec:
+                command: kubectl get ns
             - exec:
                 command: /devinfra/scripts/k8s/k8s-deploy.py
 
