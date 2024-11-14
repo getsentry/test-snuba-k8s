@@ -28,7 +28,8 @@ pipelines:
             tasks:
             - script: |
                 echo "A test pipeline"
-            - script: |
-                ls -al
             - exec:
                 command: ./scripts/sayhi.sh
+            - exec:
+                command: /devinfra/scripts/k8s/k8s-deploy.py
+
