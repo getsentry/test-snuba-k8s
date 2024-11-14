@@ -28,6 +28,8 @@ pipelines:
             tasks:
             - script: |
                 echo "A test pipeline"
+            - script: |
+                ls -al /devinfra/
             - exec:
                 command: ./scripts/sayhi.sh
             - exec:
