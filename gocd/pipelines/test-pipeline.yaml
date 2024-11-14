@@ -24,6 +24,7 @@ pipelines:
             timeout: 0
             tabs:
               Sample: my-artifact.html
+            elastic_profile_id: demo-app
             tasks:
             - script: |
                 echo "A test pipeline"
