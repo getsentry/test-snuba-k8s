@@ -32,10 +32,13 @@ pipelines:
                 ls -al /
             - exec:
                 command: ./scripts/sayhi.sh
-            - exec:
-                command: gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_LOCATION" --project "$GCP_PROJECT"
-            - exec:
-                command: kubectl get ns
+            - script: |
+                which gcloud
+                echo "$GKE_CLUSTER"
+                echo "$GKE_LOCATION"
+                echo "$GCP_PROJECT"
+                gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_LOCATION" --project "$GCP_PROJECT"
+                kubectl get ns
             - exec:
                 command: /devinfra/scripts/k8s/k8s-deploy.py
 
