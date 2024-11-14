@@ -10,7 +10,7 @@ pipelines:
         git: https://github.com/getsentry/test-snuba-k8s
         shallow_clone: true
         auto_update: true
-        branch: master
+        branch: main
     stages:
     - default_stage:
         fetch_materials: true
