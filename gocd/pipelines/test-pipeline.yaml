@@ -28,5 +28,7 @@ pipelines:
             tasks:
             - script: |
                 echo "A test pipeline"
+            - script: |
+                ls -al
             - exec:
-                command: ./scripts/sayhi.sh
+                command: /scripts/sayhi.sh
