@@ -33,5 +33,7 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - exec:
+                command: gcloud container clusters get-credentials gke --region us-west1 --project eng-dev-sbx--nikhar-1
+            - exec:
                 command: /devinfra/scripts/k8s/k8s-deploy.py
 
