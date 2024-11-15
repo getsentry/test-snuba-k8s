@@ -33,8 +33,6 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - script: |
-                gcloud config get-value account
-                gcloud projects get-iam-policy eng-dev-sbx--nikhar-1 --filter="bindings.members:$(gcloud config get-value account)" --format="json"
                 kubectl get ns
             - exec:
                 command: /devinfra/scripts/k8s/k8s-deploy.py
