@@ -33,7 +33,8 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - script: |
-                kubectl get ns
+                kubectl get pods -n gocd
+                kubectl get pods -n default
             - exec:
                 command: /devinfra/scripts/k8s/k8s-deploy.py
 
