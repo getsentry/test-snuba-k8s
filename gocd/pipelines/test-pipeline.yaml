@@ -27,7 +27,7 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                sleep 30
+                sleep 300
             - script: |
                 ls -al /
             - exec:
@@ -35,7 +35,6 @@ pipelines:
             - script: |
                 gcloud config get-value account
                 gcloud projects get-iam-policy eng-dev-sbx--nikhar-1 --filter="bindings.members:$(gcloud config get-value account)" --format="json"
-                gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION" --project "$GCP_PROJECT"
                 kubectl get ns
             - exec:
                 command: /devinfra/scripts/k8s/k8s-deploy.py
