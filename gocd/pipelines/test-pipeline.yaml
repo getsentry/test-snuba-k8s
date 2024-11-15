@@ -33,9 +33,8 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - script: |
-                echo "$GKE_CLUSTER"
-                echo "$GKE_REGION"
-                echo "$GCP_PROJECT"
+                gcloud config get-value account
+                gcloud projects get-iam-policy eng-dev-sbx--nikhar-1 --filter="bindings.members:$(gcloud config get-value account)" --format="json"
                 gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION" --project "$GCP_PROJECT"
                 kubectl get ns
             - exec:
