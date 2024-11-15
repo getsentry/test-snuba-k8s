@@ -27,7 +27,7 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                sleep 30
+                sleep 300
             - script: |
                 ls -al /
             - exec:
