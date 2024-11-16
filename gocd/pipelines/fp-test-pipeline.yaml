@@ -27,4 +27,6 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
+                kubectl -n gocd get configmaps
+            - script: |
                 kubectl diff -f ./test_pipeline_files/deployment.yaml
