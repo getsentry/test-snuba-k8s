@@ -115,30 +115,6 @@ metadata:
   name: snuba
   namespace: snuba
 ---
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  labels:
-    app_feature: shared
-    app_function: storage
-    cogs_category: shared
-    component: api
-    environment: production
-    is_canary: "false"
-    service: snuba
-    shared_resource_id: snuba_api
-    system: snuba_api
-  name: snuba-api-production
-  namespace: snuba
-spec:
-  maxReplicas: 2
-  minReplicas: 1
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: snuba-api-production
-  targetCPUUtilizationPercentage: 40
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
