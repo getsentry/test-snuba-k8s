@@ -28,6 +28,6 @@ pipelines:
             tasks:
             - script: |
                 kubectl get pods -n gocd
-                kubectl -n gocd get configmaps
+                kubectl get configmaps -n gocd 
             - script: |
                 kubectl diff -f ./test_pipeline_files/deployment.yaml
