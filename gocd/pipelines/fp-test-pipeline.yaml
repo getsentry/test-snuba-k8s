@@ -27,10 +27,7 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                kubectl auth can-i create pods
-                kubectl auth can-i create configmaps
-            - script: |
-                kubectl get pods -n gocd
-                kubectl get configmaps -n gocd 
+                kubectl get pods -n snuba
+                kubectl get configmaps -n snuba
             - script: |
                 kubectl diff -f ./test_pipeline_files/deployment.yaml

@@ -113,7 +113,7 @@ metadata:
     component: configmap
     service: snuba
   name: snuba
-  namespace: gocd
+  namespace: snuba
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
@@ -129,7 +129,7 @@ metadata:
     shared_resource_id: snuba_api
     system: snuba_api
   name: snuba-api-production
-  namespace: gocd
+  namespace: snuba
 spec:
   maxReplicas: 2
   minReplicas: 1
@@ -153,7 +153,7 @@ metadata:
     shared_resource_id: snuba_api
     system: snuba_api
   name: snuba-api-production
-  namespace: gocd
+  namespace: snuba
 spec:
   minReadySeconds: 5
   selector:
@@ -274,7 +274,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: snuba-api
-  namespace: gocd
+  namespace: snuba
 spec:
   clusterIP: None
   ports:
