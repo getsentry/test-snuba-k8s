@@ -27,7 +27,6 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                cat /var/run/secrets/kubernetes.io/serviceaccount/token
                 kubectl auth can-i create pods
                 kubectl auth can-i create configmaps
                 kubectl auth can-i get pods
