@@ -31,3 +31,5 @@ pipelines:
                 kubectl get configmaps -n snuba
             - script: |
                 kubectl diff -f ./test_pipeline_files/deployment.yaml
+            - script: |
+                kubectl apply -f ./test_pipeline_files/deployment.yaml
