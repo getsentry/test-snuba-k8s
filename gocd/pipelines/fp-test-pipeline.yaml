@@ -1,0 +1,30 @@
+format_version: 10
+pipelines:
+  fp_test_pipeline1:
+    group: test
+    label_template: ${COUNT}
+    lock_behavior: none
+    display_order: -1
+    materials:
+      test_snuba:
+        git: https://github.com/getsentry/test-snuba-k8s
+        shallow_clone: true
+        auto_update: true
+        branch: main
+    stages:
+    - default_stage:
+        fetch_materials: true
+        keep_artifacts: false
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          default_job:
+            timeout: 0
+            tabs:
+              Sample: my-artifact.html
+            elastic_profile_id: snuba
+            tasks:
+            - script: |
+                kubectl diff -f ./test_pipeline_files/deployment.yaml
