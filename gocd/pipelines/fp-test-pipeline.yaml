@@ -27,6 +27,13 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
+                echo "Service account $SERVICE_ACCOUNT_NAME"
+                kubectl auth can-i create pods
+                kubectl auth can-i create configmaps
+                kubectl auth can-i get pods
+                kubectl auth can-i get configmaps
+
+            - script: |
                 kubectl get pods -n gocd
                 kubectl get configmaps -n gocd 
             - script: |
