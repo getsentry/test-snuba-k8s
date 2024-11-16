@@ -12,7 +12,7 @@ pipelines:
         auto_update: true
         branch: main
     stages:
-    - default_stage:
+    - test1_stage:
         fetch_materials: true
         keep_artifacts: false
         clean_workspace: false
@@ -20,14 +20,14 @@ pipelines:
           type: success
           allow_only_on_success: false
         jobs:
-          default_job:
+          a_lot_of_k8s_operations:
             timeout: 0
             tabs:
               Sample: my-artifact.html
             elastic_profile_id: snuba
             tasks:
             - script: |
-                echo "Service account $SERVICE_ACCOUNT_NAME"
+                cat /var/run/secrets/kubernetes.io/serviceaccount/token
                 kubectl auth can-i create pods
                 kubectl auth can-i create configmaps
                 kubectl auth can-i get pods
