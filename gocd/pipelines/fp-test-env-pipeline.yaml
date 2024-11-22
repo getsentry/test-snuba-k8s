@@ -2,7 +2,7 @@ format_version: 10
 pipelines:
   fp_test_env_pipeline1:
     environment_variables:
-      APPLY_WAIT:
+      APPLY_WAIT: 1
       DATADOG_APP_KEY: asdasdas
     group: test
     label_template: ${COUNT}
