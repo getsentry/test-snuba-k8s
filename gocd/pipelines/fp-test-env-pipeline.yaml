@@ -1,6 +1,6 @@
 format_version: 10
 pipelines:
-  fp_test_pipeline1:
+  fp_test_env_pipeline1:
     environment_variables:
       APPLY_WAIT:
       DATADOG_APP_KEY: asdasdas
@@ -15,7 +15,7 @@ pipelines:
         auto_update: true
         branch: main
     stages:
-    - test1_stage:
+    - test1_env:
         fetch_materials: true
         keep_artifacts: false
         clean_workspace: false
@@ -23,7 +23,7 @@ pipelines:
           type: success
           allow_only_on_success: false
         jobs:
-          a_lot_of_k8s_operations:
+          run_script:
             timeout: 0
             tabs:
               Sample: my-artifact.html
@@ -31,8 +31,4 @@ pipelines:
             tasks:
             - script: |
                 kubectl get pods -n snuba
-                kubectl get configmaps -n snuba
-            - script: |
-                kubectl diff -f ./test_pipeline_files/deployment.yaml
-            - script: |
-                kubectl apply -f ./test_pipeline_files/deployment.yaml
+            
