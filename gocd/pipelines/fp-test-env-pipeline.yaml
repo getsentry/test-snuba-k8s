@@ -30,5 +30,5 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                kubectl get pods -n snuba
+                ./scripts/testenv.sh
             
