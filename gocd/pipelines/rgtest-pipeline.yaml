@@ -1,6 +1,8 @@
 format_version: 10
 pipelines:
   rgtest_pipeline1:
+    environment_variables:
+      TEST_VARIABLE: test1
     group: rgtest
     label_template: ${COUNT}
     lock_behavior: none
@@ -12,7 +14,7 @@ pipelines:
         auto_update: true
         branch: main
     stages:
-    - default_stage:
+    - rgtest_stage1:
         fetch_materials: true
         keep_artifacts: false
         clean_workspace: false
@@ -27,8 +29,20 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                /devinfra/scripts/gcloud/gcloud-wait.py
-                gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION" --project "$GCP_PROJECT"
+                echo $TEST_VARIABLE && export TEST_VARIABLE=test2
+    - rgtest_stage2:
+        fetch_materials: true
+        keep_artifacts: false
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          default_job:
+            timeout: 0
+            tabs:
+              Sample: my-artifact.html
+            elastic_profile_id: snuba
+            tasks:
             - script: |
-                kubecolor --force-color=truecolor get pods -n gocd
-                kubecolor --force-color=truecolor get pods -n default
+                echo $TEST_VARIABLE
