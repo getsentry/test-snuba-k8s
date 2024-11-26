@@ -54,4 +54,5 @@ pipelines:
                 job: default_job
                 srcfile: output/test_variable.txt
                 dest: artifacts
-            - script: cat artifacts/test_variable.txt
+            - script: |
+                cat artifacts/test_variable.txt
