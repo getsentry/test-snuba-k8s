@@ -29,7 +29,10 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                echo $TEST_VARIABLE && export TEST_VARIABLE=test2
+                echo $TEST_VARIABLE && export TEST_VARIABLE=test2 && echo $TEST_VARIABLE > ./test_variable.txt
+            artifacts:
+            - src: ./test_variable.txt
+              dest: output
     - rgtest_stage2:
         fetch_materials: true
         keep_artifacts: false
@@ -44,5 +47,11 @@ pipelines:
               Sample: my-artifact.html
             elastic_profile_id: snuba
             tasks:
+            - fetchartifact:
+                pipeline: rgtest_pipeline1
+                stage: rgtest_stage1
+                job: default_job
+                srcfile: output/test_variable.txt
+                dest: artifacts
             - script: |
-                echo $TEST_VARIABLE
+               cat artifacts/test_variable.txt
