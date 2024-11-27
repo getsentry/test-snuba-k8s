@@ -58,4 +58,5 @@ pipelines:
                 source: output
                 destination: artifacts
             - script: |
-                cat pipelines/rgtest_pipeline1/artifacts/result/test_variable.txt
+                pwd
+                find .
