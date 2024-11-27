@@ -32,8 +32,8 @@ pipelines:
                 echo $TEST_VARIABLE && export TEST_VARIABLE=test2 && echo $TEST_VARIABLE > test_variable.txt
             artifacts:
             - build:
-                src: test_variable.txt
-                dest: output
+                source: test_variable.txt
+                destination: output
     - rgtest_stage2:
         fetch_materials: true
         keep_artifacts: false
@@ -53,6 +53,6 @@ pipelines:
                 stage: rgtest_stage1
                 job: default_job
                 srcfile: output/test_variable.txt
-                dest: artifacts
+                destination: artifacts
             - script: |
                 cat artifacts/test_variable.txt
