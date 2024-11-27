@@ -58,5 +58,4 @@ pipelines:
                 source: output
                 destination: artifacts
             - script: |
-                pwd
-                find .
+                cat artifacts/output/result/test_variable.txt
