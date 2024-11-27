@@ -58,4 +58,4 @@ pipelines:
                 source: output
                 destination: artifacts
             - script: |
-                cat artifacts/result/test_variable.txt
+                cat pipelines/rgtest_pipeline1/artifacts/result/test_variable.txt
