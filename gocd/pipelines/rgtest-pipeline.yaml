@@ -31,6 +31,7 @@ pipelines:
             - script: |
                 echo $TEST_VARIABLE
                 export TEST_VARIABLE=test2
+                mkdir result
                 echo $TEST_VARIABLE > result/test_variable.txt
             artifacts:
             - build:
