@@ -29,7 +29,9 @@ pipelines:
             elastic_profile_id: snuba
             tasks:
             - script: |
-                echo $TEST_VARIABLE && export TEST_VARIABLE=test2 && echo $TEST_VARIABLE > test_variable.txt
+                echo $TEST_VARIABLE
+                export TEST_VARIABLE=test2
+                echo $TEST_VARIABLE > test_variable.txt
             artifacts:
             - build:
                 source: test_variable.txt
