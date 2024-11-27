@@ -58,4 +58,4 @@ pipelines:
                 source: output
                 destination: artifacts
             - script: |
-                cat artifacts/test_variable.txt
+                cat artifacts/result/test_variable.txt
