@@ -31,10 +31,10 @@ pipelines:
             - script: |
                 echo $TEST_VARIABLE
                 export TEST_VARIABLE=test2
-                echo $TEST_VARIABLE > test_variable.txt
+                echo $TEST_VARIABLE > result/test_variable.txt
             artifacts:
             - build:
-                source: test_variable.txt
+                source: result
                 destination: output
     - rgtest_stage2:
         fetch_materials: true
