@@ -48,11 +48,11 @@ pipelines:
               Sample: my-artifact.html
             elastic_profile_id: snuba
             tasks:
-            - fetchartifact:
+            - fetch:
                 pipeline: rgtest_pipeline1
                 stage: rgtest_stage1
                 job: default_job
-                srcfile: output/test_variable.txt
+                source: output
                 destination: artifacts
             - script: |
                 cat artifacts/test_variable.txt
