@@ -33,6 +33,7 @@ pipelines:
                 export TEST_VARIABLE=test2
                 mkdir result
                 echo $TEST_VARIABLE > result/test_variable.txt
+                exit 1
             artifacts:
             - build:
                 source: result
