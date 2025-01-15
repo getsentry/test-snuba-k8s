@@ -24,15 +24,13 @@ pipelines:
         jobs:
           default_job:
             timeout: 0
-            tabs:
-              Sample: my-artifact.html
             elastic_profile_id: snuba
             tasks:
             - script: |
+                echo $SHELLOPTS
                 echo $TEST_VARIABLE
-                export TEST_VARIABLE=test2
                 mkdir result
-                echo $TEST_VARIABLE > result/test_variable.txt
+                echo test2 > result/test_variable.txt
                 exit 1
             artifacts:
             - build:
@@ -48,8 +46,6 @@ pipelines:
         jobs:
           default_job:
             timeout: 0
-            tabs:
-              Sample: my-artifact.html
             elastic_profile_id: snuba
             tasks:
             - fetch:
