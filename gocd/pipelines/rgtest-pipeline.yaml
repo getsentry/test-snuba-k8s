@@ -84,4 +84,14 @@ pipelines:
                     source: output
                     destination: artifacts
                 - script: |
+                    if [ -f artifacts/output/result/doesnt_exist.txt ]; then
+                      exit 0
+                    else
+                      exit 1
+                    fi
+                - script: |
+                    cat artifacts/output/result/doesnt_exist.txt
+                  run_if: passed
+                - script: |
                     cat artifacts/output/result/result/richard.txt
+                  run_if: failed
