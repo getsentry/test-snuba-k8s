@@ -38,7 +38,6 @@ pipelines:
                     source: result
                     destination: output
       - rgtest_stage2:
-          run_if: failed
           fetch_materials: true
           keep_artifacts: false
           clean_workspace: false
@@ -57,7 +56,14 @@ pipelines:
                     source: output
                     destination: artifacts
                 - script: |
+                    if [ -f artifacts/output/result/test_variable.txt ]; then
+                      exit 0
+                    else
+                      exit 1
+                    fi
+                - script: |
                     cat artifacts/output/result/test_variable.txt
+                  run_if: passed
       - rgtest_stage3:
           run_if: failed
           fetch_materials: true
