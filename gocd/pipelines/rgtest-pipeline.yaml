@@ -14,45 +14,68 @@ pipelines:
         auto_update: true
         branch: main
     stages:
-    - rgtest_stage1:
-        fetch_materials: true
-        keep_artifacts: false
-        clean_workspace: false
-        approval:
-          type: success
-          allow_only_on_success: false
-        jobs:
-          default_job:
-            timeout: 0
-            elastic_profile_id: snuba
-            tasks:
-            - script: |
-                echo $SHELLOPTS
-                echo $TEST_VARIABLE
-                mkdir result
-                echo test2 > result/test_variable.txt
-                exit 1
-            artifacts:
-            - build:
-                source: result
-                destination: output
-    - rgtest_stage2:
-        fetch_materials: true
-        keep_artifacts: false
-        clean_workspace: false
-        approval:
-          type: success
-          allow_only_on_success: false
-        jobs:
-          default_job:
-            timeout: 0
-            elastic_profile_id: snuba
-            tasks:
-            - fetch:
-                pipeline: rgtest_pipeline1
-                stage: rgtest_stage1
-                job: default_job
-                source: output
-                destination: artifacts
-            - script: |
-                cat artifacts/output/result/test_variable.txt
+      - rgtest_stage1:
+          fetch_materials: true
+          keep_artifacts: false
+          clean_workspace: false
+          approval:
+            type: success
+            allow_only_on_success: false
+          jobs:
+            default_job:
+              timeout: 0
+              elastic_profile_id: snuba
+              tasks:
+                - script: |
+                    echo $SHELLOPTS
+                    echo $TEST_VARIABLE
+                    mkdir result
+                    echo test2 > result/test_variable.txt
+                    echo richard > result/richard.txt
+                    exit 1
+              artifacts:
+                - build:
+                    source: result
+                    destination: output
+      - rgtest_stage2:
+          run_if: failed
+          fetch_materials: true
+          keep_artifacts: false
+          clean_workspace: false
+          approval:
+            type: success
+            allow_only_on_success: false
+          jobs:
+            default_job:
+              timeout: 0
+              elastic_profile_id: snuba
+              tasks:
+                - fetch:
+                    pipeline: rgtest_pipeline1
+                    stage: rgtest_stage1
+                    job: default_job
+                    source: output
+                    destination: artifacts
+                - script: |
+                    cat artifacts/output/result/test_variable.txt
+      - rgtest_stage3:
+          run_if: passed
+          fetch_materials: true
+          keep_artifacts: false
+          clean_workspace: false
+          approval:
+            type: success
+            allow_only_on_success: false
+          jobs:
+            default_job:
+              timeout: 0
+              elastic_profile_id: snuba
+              tasks:
+                - fetch:
+                    pipeline: rgtest_pipeline1
+                    stage: rgtest_stage1
+                    job: default_job
+                    source: output
+                    destination: artifacts
+                - script: |
+                    cat artifacts/output/result/result/richard.txt
