@@ -59,7 +59,7 @@ pipelines:
                 - script: |
                     cat artifacts/output/result/test_variable.txt
       - rgtest_stage3:
-          run_if: passed
+          run_if: failed
           fetch_materials: true
           keep_artifacts: false
           clean_workspace: false
