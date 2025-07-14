@@ -33,7 +33,7 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - script: |
-                gcloud-gcloud-wait
+                gcloud-wait
                 gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION" --project "$GCP_PROJECT"
             - script: |
                 kubectl get pods -n gocd
