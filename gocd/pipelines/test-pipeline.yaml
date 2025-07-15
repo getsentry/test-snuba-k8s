@@ -33,11 +33,11 @@ pipelines:
             - exec:
                 command: ./scripts/sayhi.sh
             - script: |
-                /devinfra/scripts/gcloud/gcloud-wait.py
+                gcloud-wait
                 gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION" --project "$GCP_PROJECT"
             - script: |
                 kubectl get pods -n gocd
                 kubectl get pods -n default
             - exec:
-                command: /devinfra/scripts/k8s/k8s-deploy.py
+                command: k8s-deploy
 

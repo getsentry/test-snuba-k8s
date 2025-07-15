@@ -1,9 +1,9 @@
 #!/bin/bash
 
-eval $(/devinfra/scripts/regions/project_env_vars.py --region="${SENTRY_REGION}")
+eval $(regions-project-env-vars --region="${SENTRY_REGION}")
 
-/devinfra/scripts/k8s/k8stunnel \
-&& /devinfra/scripts/k8s/k8s-deploy.py \
+/devinfra/scripts/get-cluster-credentials \
+&& k8s-deploy \
   --label-selector="${LABEL_SELECTOR}" \
   --image="us-central1-docker.pkg.dev/sentryio/snuba/image:${GO_REVISION_SNUBA_REPO}" \
   --container-name="api" \
@@ -53,14 +53,14 @@ eval $(/devinfra/scripts/regions/project_env_vars.py --region="${SENTRY_REGION}"
   --container-name="eap-spans-consumer" \
   --container-name="eap-mutations-consumer" \
   --container-name="eap-spans-profiled-consumer" \
-&& /devinfra/scripts/k8s/k8s-deploy.py \
+&& k8s-deploy \
   --label-selector="${LABEL_SELECTOR}" \
   --image="us-central1-docker.pkg.dev/sentryio/snuba/image:${GO_REVISION_SNUBA_REPO}" \
   --type="cronjob" \
   --container-name="cleanup" \
   --container-name="optimize" \
   --container-name="cardinality-report" \
-&& /devinfra/scripts/k8s/k8s-deploy.py \
+&& k8s-deploy \
   --label-selector="${LABEL_SELECTOR}" \
   --image="us-central1-docker.pkg.dev/sentryio/snuba/image:${GO_REVISION_SNUBA_REPO}" \
   --type="statefulset" \
