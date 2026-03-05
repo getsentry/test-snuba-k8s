@@ -51,6 +51,7 @@ pipelines:
                       --container-name="cleanup"
               timeout: 1200
       - pipeline-complete:
+          fetch_materials: false
           jobs:
             pipeline-complete:
               tasks:

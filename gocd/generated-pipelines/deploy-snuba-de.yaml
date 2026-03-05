@@ -7,8 +7,8 @@ pipelines:
     group: snuba
     lock_behavior: unlockWhenFinished
     materials:
-      deploy-snuba-s4s-pipeline-complete:
-        pipeline: deploy-snuba-s4s
+      deploy-snuba-s4s2-pipeline-complete:
+        pipeline: deploy-snuba-s4s2
         stage: pipeline-complete
       test_snuba_k8s_repo:
         branch: main
@@ -101,6 +101,7 @@ pipelines:
                       --container-name="spans-exp-static-on"
               timeout: 1200
       - pipeline-complete:
+          fetch_materials: false
           jobs:
             pipeline-complete:
               tasks:

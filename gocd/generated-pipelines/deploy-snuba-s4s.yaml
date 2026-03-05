@@ -1,7 +1,7 @@
 format_version: 10
 pipelines:
   deploy-snuba-s4s:
-    display_order: 2
+    display_order: 9
     environment_variables:
       SENTRY_REGION: s4s
     group: snuba
@@ -60,6 +60,7 @@ pipelines:
                 - script: |
                     ##!/bin/bash
       - pipeline-complete:
+          fetch_materials: false
           jobs:
             pipeline-complete:
               tasks:

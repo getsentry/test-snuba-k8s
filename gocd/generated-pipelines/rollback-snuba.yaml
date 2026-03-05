@@ -3,9 +3,9 @@ pipelines:
   rollback-snuba:
     display_order: 1
     environment_variables:
-      ALL_PIPELINE_FLAGS: --pipeline=deploy-snuba-s4s --pipeline=deploy-snuba-de --pipeline=deploy-snuba-us --pipeline=deploy-snuba-customer-1 --pipeline=deploy-snuba-customer-2 --pipeline=deploy-snuba-customer-4 --pipeline=deploy-snuba-customer-7
+      ALL_PIPELINE_FLAGS: --pipeline=deploy-snuba-s4s2 --pipeline=deploy-snuba-de --pipeline=deploy-snuba-us --pipeline=deploy-snuba-customer-1 --pipeline=deploy-snuba-customer-2 --pipeline=deploy-snuba-customer-4 --pipeline=deploy-snuba-customer-7
       GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}'
-      REGION_PIPELINE_FLAGS: --pipeline=deploy-snuba-s4s --pipeline=deploy-snuba-de --pipeline=deploy-snuba-us --pipeline=deploy-snuba-customer-1 --pipeline=deploy-snuba-customer-2 --pipeline=deploy-snuba-customer-4 --pipeline=deploy-snuba-customer-7
+      REGION_PIPELINE_FLAGS: --pipeline=deploy-snuba-s4s2 --pipeline=deploy-snuba-de --pipeline=deploy-snuba-us --pipeline=deploy-snuba-customer-1 --pipeline=deploy-snuba-customer-2 --pipeline=deploy-snuba-customer-4 --pipeline=deploy-snuba-customer-7
       ROLLBACK_MATERIAL_NAME: test_snuba_k8s_repo
       ROLLBACK_STAGE: deploy-primary
       TRIGGERED_BY: ""
